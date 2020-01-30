@@ -26,6 +26,9 @@ App.request = function (method, data) {
 }
 
 App.replyToSender = function (text) {
+  if(typeof App.message.text == 'undefined'){
+    return Logger.log(text);
+  }
   return App.request('sendMessage', {
     'chat_id': App.message.from.id,
     'parse_mode' : 'html',
@@ -64,9 +67,6 @@ function doPost(e) {
     App.logActivity.command = App.command;
     App.logActivity.argument = words;
     App.logActivity.timestamp = new Date();
-    if(App.command != 'init' && App.command != null){
-      App.setSession();  
-    }
      
     App.Route[App.command].apply(App.Route, words);
   }
