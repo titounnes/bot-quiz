@@ -8,12 +8,13 @@ App.loadSheet = function(name){
 App.setSession = function() {
   var session = App.loadSheet('session')
   var data = session.getRange(2,1,session.getLastRow()-1,2).getValues();
-  
+  var log = JSON.stringify(App.logActivity);
   for(var i = 0; i < data.length; i++){
     if(data[i][0]==App.message.from.id){
-      return session.getRange(i+2,2).setValue(JSON.stringify(App.logActivity));
+      return session.getRange(i+2,2).setValue(log);
     }
-  } 
+  }
+  session.appendRow([App.message.from.id,log]);
 }
 
 App.getSession = function() {
@@ -25,4 +26,15 @@ App.getSession = function() {
     }
   }
   return false;
+}
+
+App.unsetSession = function() {
+  var session = App.loadSheet('session')
+  var data = session.getRange(2,1,session.getLastRow()-1,2).getValues();
+  
+  for(var i = 0; i < data.length; i++){
+    if(data[i][0]==App.message.from.id){
+      return session.deleteRow(i+2);
+    }
+  } 
 }
