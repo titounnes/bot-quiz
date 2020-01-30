@@ -40,3 +40,16 @@ App.addEmail = function (email) {
   App.replyToSender('Email '+email+' sudah didaftarkan.');
   
 }
+
+App.sendMail = function(email, subject, body) {
+  var quotaRemain = MailApp.getRemainingDailyQuota();
+  if(quotaRemain > 0){
+    var email = 'harjito@mail.unnes.ac.id';
+    var subject = 'Hello world Again and gain';
+    var body = '<h1>Some one test your script</h1>';
+    MailApp.sendEmail({to:email, subject:subject, htmlBody:body});
+    return App.replyToSender( 'Email sent.');
+  }
+  return App.replyToSender('Your quota remain is 0');
+}
+
