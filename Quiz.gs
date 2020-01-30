@@ -1,7 +1,4 @@
 App.createQuiz = function(name) {
-  if(name == null){
-    return App.replyToSender('Silahkan ketikkan nama quiz tanpa spasi.');
-  }
   App.replyToSender('Sedang menyiapkan quiz '+name+'.');
   
   var myDir = App.folder.getFoldersByName(App.message.from.id);
@@ -9,22 +6,22 @@ App.createQuiz = function(name) {
     App.folder.createFolder(App.message.from.id);
     var myDir = App.folder.getFoldersByName(App.message.from.id)
   }
-    
+  var help = [
+    'Untuk Menambah Item ketikkan perintah <b>addItem</b>.\n',
+    'Untuk Mengedit Item ketikkan <b>editItem</b>.\n',
+   ]
   var currDir = myDir.next();
   if(currDir.getFilesByName(name).hasNext()){
     var quizDoc = currDir.getFilesByName(name).next(); 
-    var link = quizDoc.getUrl(); 
-    var pages = App.countPages(quizDoc)
-    return App.replyToSender('Quiz dengan nama '+name+' sudah pernah dibuat sebanyak '+pages+' halaman.\nUntuk mengedit silahkan klik <a href="'+link+'">Edit</a>');
+    return App.replyToSender('Quiz dengan nama '+name+' sudah dibuat .\n'+help.join(''));
   }
   
-  var doc = DocumentApp.create(name);
+  var doc = SpreadsheetApp.create(name);
   var temp = DriveApp.getFileById(doc.getId());
   currDir.addFile(temp)
   DriveApp.getRootFolder().removeFile(temp);
   
   doc = currDir.getFilesByName(name).next();
-  var link = doc.getUrl();
   var tbl = App.folder.getFilesByName('app-table').next().getId();
   var ss = SpreadsheetApp.openById(tbl);
   var quiz = ss.getSheetByName('quiz');
@@ -40,39 +37,10 @@ App.createQuiz = function(name) {
       email = user.getRange(i+2,3).getValue();
     }
   }
-  quizDoc = DocumentApp.openById(doc.getId());
-  quizDoc.addEditor(email);
+  //quizDoc = SpreadsheetApp.openById(doc.getId());
+  currDir.addEditor(email);
   
-  App.replyToSender('Quiz '+name+' telah siap..\nUntuk mengedit silahkan klik <a href="'+link+'">Edit</a>');
+  App.replyToSender('Quiz '+name+' telah siap... \n'+help.join(''));
   
 }
 
-App.countPages = function(doc) {
-   var blob = doc.getAs("application/pdf");
-   var data = blob.getDataAsString();
-
-   var re = /Pages\/Count (\d+)/g;
-   var match;
-
-   var pages = 0;
-
-   while(match = re.exec(data)) {
-
-      var value = parseInt(match[1]);
-
-      if (value > pages) {
-         pages = value;
-      }
-   }
-
-   return pages; 
-}
-
-function countPage(){
-  var doc = DocumentApp.openById('1NAjQmwwsYBQSwrA7MQUlz4Rncu99trXqDSfaOxmBJ0c');
-  var child = doc.getBody().getNumChildren();
-  for(var i = 0; i < child; i++){
-    var elem = doc.getBody().getChild(i);
-    Logger.log(elem.getAttributes())
-  }
-}
